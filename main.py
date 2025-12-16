@@ -3,7 +3,7 @@ import os
 import shutil
 from datetime import datetime
 from colorama import init, Fore, Style
-from src import get, create, delete, edit
+from src import get, create, delete, edit, auth
 
 # Initialize colorama
 init(autoreset=True)
@@ -647,4 +647,10 @@ def edit_menu():
             pause()
 
 if __name__ == "__main__":
+    try:
+        print("Initializing authentication...")
+        auth.validate_connection()
+    except Exception:
+        print(Fore.RED + "Authentication failed. Exiting." + Style.RESET_ALL)
+        sys.exit(1)
     main_menu()
