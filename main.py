@@ -17,6 +17,61 @@ def print_header(text):
 def pause():
     input(Fore.YELLOW + "\nPress Enter to continue..." + Style.RESET_ALL)
 
+def input_with_esc(prompt):
+    sys.stdout.write(prompt)
+    sys.stdout.flush()
+    buffer = []
+    
+    if os.name == 'nt':
+        import msvcrt
+        while True:
+            ch = msvcrt.getch()
+            if ch == b'\x1b': # Esc
+                print('')
+                return None
+            elif ch == b'\r': # Enter
+                print('')
+                return ''.join(buffer)
+            elif ch == b'\x08': # Backspace
+                if buffer:
+                    buffer.pop()
+                    sys.stdout.write('\b \b')
+                    sys.stdout.flush()
+            else:
+                try:
+                    char = ch.decode('utf-8')
+                    buffer.append(char)
+                    sys.stdout.write(char)
+                    sys.stdout.flush()
+                except:
+                    pass
+    else:
+        import tty
+        import termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setcbreak(fd)
+            while True:
+                ch = sys.stdin.read(1)
+                if ord(ch) == 27: # Esc
+                    print('')
+                    return None
+                elif ord(ch) == 10: # Enter
+                    print('')
+                    return ''.join(buffer)
+                elif ord(ch) == 127: # Backspace
+                    if buffer:
+                        buffer.pop()
+                        sys.stdout.write('\b \b')
+                        sys.stdout.flush()
+                else:
+                    buffer.append(ch)
+                    sys.stdout.write(ch)
+                    sys.stdout.flush()
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
 def get_input_with_list(prompt, item_type):
     """
     Displays a prompt on the left and a list of items on the right.
@@ -51,7 +106,11 @@ def get_input_with_list(prompt, item_type):
         for name in item_names:
             print(f"- {name}")
         print("-" * 20)
-        return input(prompt)
+        print(Fore.YELLOW + "(Press Esc to go back)" + Style.RESET_ALL)
+        val = input_with_esc(prompt)
+        if val is None:
+            return None
+        return val
 
     # Prepare sidebar lines
     sidebar_lines = [Fore.MAGENTA + f"--- {header} ---" + Style.RESET_ALL]
@@ -119,9 +178,9 @@ def get_input_with_list(prompt, item_type):
         print(f"{' ':<{main_width}} | {name}")
     
     print("\n" + "-" * columns)
-    print(Fore.YELLOW + "(Press Enter to go back)" + Style.RESET_ALL)
-    val = input(prompt)
-    if not val.strip():
+    print(Fore.YELLOW + "(Press Esc to go back)" + Style.RESET_ALL)
+    val = input_with_esc(prompt)
+    if val is None:
         return None
     return val
 

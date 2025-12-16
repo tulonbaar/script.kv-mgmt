@@ -1,4 +1,5 @@
 from .auth import get_key_client, get_secret_client, get_certificate_client
+from azure.core.exceptions import HttpResponseError
 
 def update_key_properties(name, enabled=None, key_ops=None, not_before=None, expires_on=None):
     try:
@@ -82,6 +83,11 @@ def update_key_version_properties(name, version, enabled):
         print(f"Updating key '{name}' version '{version}'...")
         client.update_key_properties(name, version=version, enabled=enabled)
         print(f"Key version updated successfully.")
+    except HttpResponseError as e:
+        if "associated with a certificate" in str(e):
+            print(f"Error: Key '{name}' is associated with a certificate. Please manage the certificate versions instead.")
+        else:
+            print(f"Error updating key version: {e}")
     except Exception as e:
         print(f"Error updating key version: {e}")
 
@@ -91,6 +97,11 @@ def update_secret_version_properties(name, version, enabled):
         print(f"Updating secret '{name}' version '{version}'...")
         client.update_secret_properties(name, version=version, enabled=enabled)
         print(f"Secret version updated successfully.")
+    except HttpResponseError as e:
+        if "associated with a certificate" in str(e):
+            print(f"Error: Secret '{name}' is associated with a certificate. Please manage the certificate versions instead.")
+        else:
+            print(f"Error updating secret version: {e}")
     except Exception as e:
         print(f"Error updating secret version: {e}")
 
@@ -122,6 +133,11 @@ def disable_all_but_newest_key_version(name):
                 print(f"Disabling version {v.version}...")
                 client.update_key_properties(name, version=v.version, enabled=False)
         print("All other versions disabled.")
+    except HttpResponseError as e:
+        if "associated with a certificate" in str(e):
+            print(f"Error: Key '{name}' is associated with a certificate. Please manage the certificate versions instead.")
+        else:
+            print(f"Error disabling old key versions: {e}")
     except Exception as e:
         print(f"Error disabling old key versions: {e}")
 
@@ -144,6 +160,11 @@ def disable_all_but_newest_secret_version(name):
                 print(f"Disabling version {v.version}...")
                 client.update_secret_properties(name, version=v.version, enabled=False)
         print("All other versions disabled.")
+    except HttpResponseError as e:
+        if "associated with a certificate" in str(e):
+            print(f"Error: Secret '{name}' is associated with a certificate. Please manage the certificate versions instead.")
+        else:
+            print(f"Error disabling old secret versions: {e}")
     except Exception as e:
         print(f"Error disabling old secret versions: {e}")
 
