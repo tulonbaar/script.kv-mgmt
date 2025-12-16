@@ -1,0 +1,6 @@
+azure-identity
+azure-keyvault-keys
+azure-keyvault-secrets
+azure-keyvault-certificates
+python-dotenv
+colorama
