@@ -52,10 +52,14 @@ Create a `.env` file in the root directory with your Azure credentials and Key V
 
 Example `.env`:
 ```env
-KEY_VAULT_URL=https://<your-key-vault-name>.vault.azure.net/
-AZURE_TENANT_ID=<your-tenant-id>
-AZURE_CLIENT_ID=<your-client-id>
-AZURE_CLIENT_SECRET=<your-client-secret>
+AZURE_TENANT_ID="your-tenant-id"
+AZURE_CLIENT_ID="your-client-id"
+AZURE_CLIENT_SECRET="your-client-secret"
+KEY_VAULT_URL="https://your-key-vault-name.vault.azure.net/"
+
+# Optional: User Login (if not using Service Principal), for some reason works only for Windows
+AZURE_USERNAME="your-username@domain.com"
+AZURE_PASSWORD="your-password"
 ```
 
 ## Usage
